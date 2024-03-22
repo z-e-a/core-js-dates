@@ -249,10 +249,31 @@ function getQuarter(date) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  const startDate = new Date(
+    Date.parse(period.start.split('-').reverse().join('-'))
+  );
+  const endDate = new Date(
+    Date.parse(period.end.split('-').reverse().join('-'))
+  );
+  const periodLength = Math.ceil(
+    (endDate - startDate + 1) / (24 * 60 * 60 * 1000)
+  );
+  return Array.from({ length: periodLength }, (_, i) => i)
+    .map(
+      (day) =>
+        new Date(
+          startDate.getFullYear(),
+          startDate.getMonth(),
+          startDate.getDate() + day
+        )
+    )
+    .map(
+      (date) =>
+        `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`
+    )
+    .filter((el, ind) => ind % (countWorkDays + countOffDays) < countWorkDays);
 }
-
 /**
  * Determines whether the year in the provided date is a leap year.
  * A leap year is a year divisible by 4, but not by 100, unless it is also divisible by 400.
